@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * The installation file.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function maintenance_mode_install() {
+
+  // Set the default message.
+  $message = "@site is currently under maintenance. We should be back shortly. Thank you for your patience.";
+
+  // Set the site name.
+  \Drupal::configFactory()->getEditable('system.maintenance')->set('message', $message)->save();
+}
+/**
+ * Implements hook_uninstall().
+ */
+function maintenance_mode_uninstall() {
+  // Remove views on module disable
+  Drupal::configFactory()->getEditable('system.maintenance_mode')->delete();
+  drupal_set_message(t('View has been removed.'));
+}

@@ -1,0 +1,7 @@
+maintenance_mode.form:
+  path: '/admin/config/user-interface/maintenance-mode'
+  defaults:
+    _form: '\Drupal\maintenance_mode\Form\MaintenanceForm'
+    _title: 'Maintenance Mode'
+  requirements:
+    _permission: 'administer site configuration'

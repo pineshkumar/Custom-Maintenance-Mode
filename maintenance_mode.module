@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * @file
+ * The main module file.
+ */
+
+use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implementation of maintenance_mode_help().
+ */
+function maintenance_mode_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.maintenance_mode':
+      $output = '<p>' . t('This module places a Call Us button (click-to-call) to the different different place in your website of the screen which is visible for your mobile visitors and website.This module very useful for website face-time and Mobile Because your mobile visitors are already holding their phone it will allow them to call you with one simple touch of the button. No more complicated copy-and-pasting or memoizing the phone number!.You can also add button for the social link in website with the using of this module.') . '</p>';
+      $output .= '<h3>' . t('How to use the plugin') . '</h3>';
+      $output .= t('<strong>IMPORTANT:</strong> The first field in order of appearance will be the one used as the "phone number" of the web to contact.') . '<br />';
+      $output .= '<h4>' . t('Your Callus must meet these requirements:') . '</h4>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('<em>phone</em> must be set to <em>Fields</em>.') . '</li>';
+      $output .= '</ul>';
+      $output .= '<h4>' . t('Choose <em>Call Us</em> in the <em>Style</em> dialog within your view, which will prompt you to configure the settings.') . '</h4>';
+      return $output;
+  }
+}
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function maintenance_mode_theme_registry_alter(&$theme_registry) {
+
+  // Override the default maintenance.tpl.php with our own.
+  if (isset($theme_registry['maintenance_page'])) {
+
+    // Get the current route.
+    $current_route = \Drupal::routeMatch()->getRouteName();
+
+    // Don't do anything on the update.php page.
+    if (!empty($current_route) && $current_route !== 'system.db_update') {
+
+      // Get the path to this module.
+      $module_path = drupal_get_path('module', 'maintenance_mode');
+
+      // Set the theme path and file path.
+      $theme_registry['maintenance_page']['theme path'] = $module_path;
+      $theme_registry['maintenance_page']['path'] = $module_path . '/templates';
+
+      // Get the maintenance page variables.
+      $variables = _mode_maintenance_get_maintenance_page_variables();
+
+      // Add custom variables.
+      $theme_registry['maintenance_page']['variables'] = $variables;
+
+    }
+  }
+}
+
+/**
+ * Get the maintenance page variables.
+ */
+function _mode_maintenance_get_maintenance_page_variables() {
+
+  // Load the site name out of configuration.
+  $site_config = \Drupal::config('system.site');
+  $site_name = $site_config->get('name');
+  // Load the maintenance mode value.
+  $config = \Drupal::config('maintenance_mode.settings');
+  $cms_page_title = $config->get('cms_page_title');
+  $cms_headline = $config->get('cms_headline');
+  $cms_description = $config->get('cms_description');
+  $cms_footer_text = $config->get('cms_footer_text');
+  $cms_logo_width = $config->get('cms_logo_width');
+  $cms_bg_color = $config->get('cms_bg_color');
+  $cms_font_color = $config->get('cms_font_color');
+  if (isset($cms_bg_image)) {
+    $cms_bg_image = $config->get('cms_bg_image');
+    $cms_file = file_load($cms_bg_image[0]);
+    $cms_url = $cms_file->url();
+  } else {
+    $cms_bg_image = $config->get('cms_bg_image');
+    $cms_file = file_load($cms_bg_image[0]);
+    $cms_url = '';
+  }
+  // Todo: replace deprecated function.
+  $maintenance_text = SafeMarkup::format(\Drupal::config('system.maintenance')->get('message'), [
+    '@site' => $site_name,
+  ]);
+  // Return the array.
+  return [
+    'maintenance_text' => $maintenance_text,
+    'site_name' => $site_name,
+    'cms_page_title' => $cms_page_title,
+    'cms_headline' => $cms_headline,
+    'cms_description' => $cms_description,
+    'cms_footer_text' => $cms_footer_text,
+    'cms_logo_width' => $cms_logo_width,
+    'cms_bg_color' => $cms_bg_color,
+    'cms_font_color' => $cms_font_color,
+    'cms_bg_image' => $cms_url,
+  ];
+}

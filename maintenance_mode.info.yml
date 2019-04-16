@@ -1,0 +1,10 @@
+type: module
+name: Maintenance Mode
+description: 'Custom maintenance page.'
+# core: '8.x'
+configure: maintenance_mode.form
+# Information added by Drupal.org packaging script on 2018-09-27
+version: '8.x-1.0'
+core: '8.x'
+project: 'maintenance_mode'
+datestamp: 1538040786
